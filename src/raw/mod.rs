@@ -8,5 +8,6 @@ mod client;
 mod endpoint;
 pub mod request;
 pub mod response;
+pub mod response_impl;
 
 pub use self::client::Client;
