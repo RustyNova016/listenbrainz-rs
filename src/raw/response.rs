@@ -344,7 +344,7 @@ pub struct StatsSitewideArtistsPayload {
     pub to_ts: i64,
 }
 
-/// Type of the [`StatsSitewideArtistsTimeRange::artists`] field.
+/// Type of the [`StatsSitewideArtistsPayload::artists`] field.
 #[derive(Debug, Deserialize)]
 pub struct StatsSitewideArtistsArtist {
     pub artist_mbids: Option<Vec<String>>,
@@ -604,7 +604,7 @@ pub struct StatsReleaseGroupListenersPayload {
     pub to_ts: i64,
 
     /// The total number of listens of a release
-    pub total_listen_count: i64
+    pub total_listen_count: i64,
 }
 
 /// Type of the [`StatsReleaseGroupListenersPayload::listeners`] field.
