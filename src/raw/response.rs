@@ -12,8 +12,8 @@ use attohttpc::Response;
 use serde::de::DeserializeOwned;
 use serde::Deserialize;
 
-use crate::Error;
 use super::jspf;
+use crate::Error;
 
 /// Contains rate limiting information.
 ///
@@ -22,7 +22,7 @@ use super::jspf;
 /// as the former is resilient against clients with incorrect clocks.
 ///
 /// [API docs]: https://listenbrainz.readthedocs.io/en/production/dev/api/#rate-limiting
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RateLimit {
     pub limit: u64,
     pub remaining: u64,
@@ -112,7 +112,7 @@ macro_rules! response_type {
 
 response_type! {
     /// Response type for [`Client::submit_listens`](super::Client::submit_listens).
-    #[derive(Debug, Deserialize)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct SubmitListensResponse {
         pub status: String,
     }
@@ -122,7 +122,7 @@ response_type! {
 
 response_type! {
     /// Response type for [`Client::validate_token`](super::Client::validate_token).
-    #[derive(Debug, Deserialize)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct ValidateTokenResponse {
         pub code: u16,
         pub message: String,
@@ -136,7 +136,7 @@ response_type! {
 
 response_type! {
     /// Response type for [`Client::delete_listen`](super::Client::delete_listen).
-    #[derive(Debug, Deserialize)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct DeleteListenResponse {
         pub status: String,
     }
@@ -226,14 +226,14 @@ pub struct UserSimilarUsersPayload {
 
 response_type! {
     /// Response type for [`Client::user_listen_count`](super::Client::user_listen_count).
-    #[derive(Debug, Deserialize)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct UserListenCountResponse {
         pub payload: UserListenCountPayload,
     }
 }
 
 /// Type of the [`UserListenCountResponse::payload`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct UserListenCountPayload {
     pub count: u64,
 }
@@ -242,14 +242,14 @@ pub struct UserListenCountPayload {
 
 response_type! {
     /// Response type for [`Client::user_playing_now`](super::Client::user_playing_now).
-    #[derive(Debug, Deserialize)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct UserPlayingNowResponse {
         pub payload: UserPlayingNowPayload,
     }
 }
 
 /// Type of the [`UserPlayingNowResponse::payload`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct UserPlayingNowPayload {
     pub count: u8,
     pub user_id: String,
@@ -258,14 +258,14 @@ pub struct UserPlayingNowPayload {
 }
 
 /// Type of the [`UserPlayingNowPayload::listens`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct UserPlayingNowListen {
     pub track_metadata: UserPlayingNowTrackMetadata,
     pub playing_now: bool,
 }
 
 /// Type of the [`UserPlayingNowListen::track_metadata`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct UserPlayingNowTrackMetadata {
     pub artist_name: String,
     pub track_name: String,
@@ -300,23 +300,24 @@ response_type! {
 
 response_type! {
     /// Response type for [`Client::user_listens`](super::Client::user_listens).
-    #[derive(Debug, Deserialize)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct UserListensResponse {
         pub payload: UserListensPayload,
     }
 }
 
 /// Type of the [`UserListensResponse::payload`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct UserListensPayload {
     pub count: u64,
     pub latest_listen_ts: i64,
+    pub oldest_listen_ts: i64,
     pub user_id: String,
     pub listens: Vec<UserListensListen>,
 }
 
 /// Type of the [`UserListensPayload::listens`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct UserListensListen {
     pub user_name: String,
     pub inserted_at: i64,
@@ -326,19 +327,37 @@ pub struct UserListensListen {
 }
 
 /// Type of the [`UserListensListen::track_metadata`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct UserListensTrackMetadata {
     pub artist_name: String,
     pub track_name: String,
     pub release_name: Option<String>,
     pub additional_info: HashMap<String, serde_json::Value>,
+    pub mbid_mapping: Option<UserListensMBIDMapping>,
+}
+
+/// Type of the [`UserListensTrackMetadata::mbid_mapping`] field.
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+pub struct UserListensMBIDMapping {
+    pub artist_mbids: Option<Vec<String>>,
+    pub artists: Option<Vec<UserListensMappingArtist>>,
+    pub recording_mbid: String,
+    pub recording_name: Option<String>,
+}
+
+/// Type of the [`UserListensMBIDMapping::artists`] field.
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+pub struct UserListensMappingArtist {
+    pub artist_mbid: String,
+    pub artist_credit_name: String,
+    pub join_phrase: String,
 }
 
 // --------- latest-import (GET)
 
 response_type! {
     /// Response type for [`Client::get_latest_import`](super::Client::get_latest_import).
-    #[derive(Debug, Deserialize)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct GetLatestImportResponse {
         pub latest_import: i64,
         pub musicbrainz_id: String,
@@ -349,7 +368,7 @@ response_type! {
 
 response_type! {
     /// Response type for [`Client::update_latest_import`](super::Client::update_latest_import).
-    #[derive(Debug, Deserialize)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct UpdateLatestImportResponse {
         pub status: String,
     }
@@ -401,14 +420,14 @@ response_type! {
 
 response_type! {
     /// Response type for [`Client::stats_sitewide_artists`](super::Client::stats_sitewide_artists).
-    #[derive(Debug, Deserialize)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct StatsSitewideArtistsResponse {
         pub payload: StatsSitewideArtistsPayload,
     }
 }
 
 /// Type of the [`StatsSitewideArtistsResponse::payload`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct StatsSitewideArtistsPayload {
     pub artists: Vec<StatsSitewideArtistsArtist>,
     pub offset: u64,
@@ -420,7 +439,7 @@ pub struct StatsSitewideArtistsPayload {
 }
 
 /// Type of the [`StatsSitewideArtistsTimeRange::artists`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct StatsSitewideArtistsArtist {
     pub artist_mbids: Option<Vec<String>>,
     pub artist_name: String,
@@ -431,14 +450,14 @@ pub struct StatsSitewideArtistsArtist {
 
 response_type! {
     /// Response type for [`Client::stats_user_listening_activity`](super::Client::stats_user_listening_activity).
-    #[derive(Debug, Deserialize)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct StatsUserListeningActivityResponse {
         pub payload: StatsUserListeningActivityPayload,
     }
 }
 
 /// Type of the [`StatsUserListeningActivityResponse::payload`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct StatsUserListeningActivityPayload {
     pub user_id: String,
     pub listening_activity: Vec<StatsUserListeningActivityListeningActivity>,
@@ -448,7 +467,7 @@ pub struct StatsUserListeningActivityPayload {
 }
 
 /// Type of the [`StatsUserListeningActivityPayload::listening_activity`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct StatsUserListeningActivityListeningActivity {
     pub listen_count: u64,
     pub from_ts: i64,
@@ -460,14 +479,14 @@ pub struct StatsUserListeningActivityListeningActivity {
 
 response_type! {
     /// Response type for [`Client::stats_user_daily_activity`](super::Client::stats_user_daily_activity).
-    #[derive(Debug, Deserialize)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct StatsUserDailyActivityResponse {
         pub payload: StatsUserDailyActivityPayload,
     }
 }
 
 /// Type of the [`StatsUserDailyActivityResponse::payload`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct StatsUserDailyActivityPayload {
     pub user_id: String,
     pub daily_activity: StatsUserDailyActivityDailyActivity,
@@ -478,13 +497,13 @@ pub struct StatsUserDailyActivityPayload {
 }
 
 /// Type of the [`StatsUserDailyActivityPayload::daily_activity`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct StatsUserDailyActivityDailyActivity {
     pub days: HashMap<String, Vec<StatsUserDailyActivityHour>>,
 }
 
 /// Type of the [`StatsUserDailyActivityDailyActivity::days`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct StatsUserDailyActivityHour {
     pub hour: u8,
     pub listen_count: u64,
@@ -494,14 +513,14 @@ pub struct StatsUserDailyActivityHour {
 
 response_type! {
     /// Response type of [`Client::stats_user_recordings`](super::Client::stats_user_recordings).
-    #[derive(Debug, Deserialize)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct StatsUserRecordingsResponse {
         pub payload: StatsUserRecordingsPayload,
     }
 }
 
 /// Type of the [`StatsUserRecordingsResponse::payload`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct StatsUserRecordingsPayload {
     pub recordings: Vec<StatsUserRecordingsRecording>,
     pub count: u64,
@@ -514,7 +533,7 @@ pub struct StatsUserRecordingsPayload {
 }
 
 /// Type of the [`StatsUserRecordingsPayload::recordings`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct StatsUserRecordingsRecording {
     pub artist_mbids: Option<Vec<String>>,
     pub artist_msid: Option<String>,
@@ -532,14 +551,14 @@ pub struct StatsUserRecordingsRecording {
 
 response_type! {
     /// Response type of [`Client::stats_user_artist_map`](super::Client::stats_user_artist_map).
-    #[derive(Debug, Deserialize)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct StatsUserArtistMapResponse {
         pub payload: StatsUserArtistMapPayload,
     }
 }
 
 /// Type of the [`StatsUserArtistMapResponse::payload`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct StatsUserArtistMapPayload {
     pub artist_map: Vec<StatsUserArtistMapCountry>,
     pub user_id: String,
@@ -550,7 +569,7 @@ pub struct StatsUserArtistMapPayload {
 }
 
 /// Type of the [`StatsUserArtistMapPayload::artist_map`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct StatsUserArtistMapCountry {
     pub country: String,
     pub artist_count: u64,
@@ -560,14 +579,14 @@ pub struct StatsUserArtistMapCountry {
 
 response_type! {
     /// Response type for [`Client::stats_user_releases`](super::Client::stats_user_releases).
-    #[derive(Debug, Deserialize)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct StatsUserReleasesResponse {
         pub payload: StatsUserReleasesPayload,
     }
 }
 
 /// Type of the [`StatsUserReleasesResponse::payload`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct StatsUserReleasesPayload {
     pub releases: Vec<StatsUserReleasesRelease>,
     pub count: u64,
@@ -580,7 +599,7 @@ pub struct StatsUserReleasesPayload {
 }
 
 /// Type of the [`StatsUserReleasesPayload::releases`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct StatsUserReleasesRelease {
     pub artist_mbids: Option<Vec<String>>,
     pub artist_msid: Option<String>,
@@ -595,14 +614,14 @@ pub struct StatsUserReleasesRelease {
 
 response_type! {
     /// Response type of [`Client::stats_user_artists`](super::Client::stats_user_artists).
-    #[derive(Debug, Deserialize)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct StatsUserArtistsResponse {
         pub payload: StatsUserArtistsPayload,
     }
 }
 
 /// Type of the [`StatsUserArtistsResponse::payload`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct StatsUserArtistsPayload {
     pub artists: Vec<StatsUserArtistsArtist>,
     pub count: u64,
@@ -615,7 +634,7 @@ pub struct StatsUserArtistsPayload {
 }
 
 /// Type of the [`StatsUserArtistsPayload::artists`] field.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
 pub struct StatsUserArtistsArtist {
     pub artist_mbids: Option<Vec<String>>,
     pub artist_msid: Option<String>,
@@ -627,7 +646,7 @@ pub struct StatsUserArtistsArtist {
 
 response_type! {
     /// Response type for [`Client::status_get_dump_info`](super::Client::status_get_dump_info).
-    #[derive(Debug, Deserialize)]
+    #[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
     pub struct StatusGetDumpInfoResponse {
         pub code: u16,
         pub message: String,
@@ -635,6 +654,40 @@ response_type! {
         pub id: i64,
         pub timestamp: String,
     }
+}
+
+// ---------- stats/release-group/(release_group_mbid)/listeners
+
+response_type! {
+    /// Response type for [`Client::stats_release_group_listeners`](super::Client::stats_release_group_listeners).
+    #[derive(Debug, Deserialize)]
+    pub struct StatsReleaseGroupListenersResponse {
+        pub payload: StatsReleaseGroupListenersPayload
+    }
+}
+
+/// Type of the [`StatsReleaseGroupListenersResponse::payload`] field.
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+pub struct StatsReleaseGroupListenersPayload {
+    pub artist_mbids: Vec<String>,
+    pub artist_name: String,
+    pub caa_id: Option<i64>,
+    pub caa_release_mbid: Option<String>,
+    pub from_ts: i64,
+    pub last_updated: i64,
+    pub listeners: Vec<StatsReleaseGroupListenersListeners>,
+    pub release_group_mbid: String,
+    pub release_group_name: String,
+    pub stats_range: String,
+    pub to_ts: i64,
+    pub total_listen_count: i64,
+}
+
+/// Type of the [`StatsReleaseGroupListenersPayload::listeners`] field.
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq)]
+pub struct StatsReleaseGroupListenersListeners {
+    pub listen_count: u64,
+    pub username_name: String,
 }
 
 // --------- user/{user_name}/followers
