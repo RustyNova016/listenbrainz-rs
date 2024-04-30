@@ -307,7 +307,7 @@ impl Client {
     pub fn playlist_create(
         &self,
         token: &str,
-        playlist: jspf::Playlist,
+        playlist: PlaylistCreate,
     ) -> Result<PlaylistCreateResponse, Error> {
         self.post(Endpoint::PlaylistCreate, token, playlist)
     }
