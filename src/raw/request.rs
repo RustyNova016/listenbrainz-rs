@@ -98,10 +98,11 @@ pub struct PlaylistCreate {
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub struct PlaylistCreatePlaylist {
     pub title: String,
-    pub tracks: Vec<PlaylistCreatePlaylistTrack>
+    pub track: Vec<PlaylistCreatePlaylistTrack>,
+    pub extension: PlaylistCreatePlaylistExtension
 }
 
-/// A track of the playlist.
+/// A track of the playlist for [`PlaylistCreatePlaylist`]
 /// 
 /// The identifier part of the track must be a MusicBrainz URI:
 /// ```
@@ -118,13 +119,14 @@ pub struct PlaylistCreatePlaylistTrack {
     pub identifier: String
 }
 
-/// The extension of the playlist
+/// The extension of [`PlaylistCreatePlaylist`]
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub struct PlaylistCreatePlaylistExtension {
-    #[serde(rename = "https://musicbrainz.org/doc/jspf#track")]
+    #[serde(rename = "https://musicbrainz.org/doc/jspf#playlist")]
     pub musicbrainz: PlaylistCreatePlaylistExtensionInner,
 }
 
+/// Inner part of [`PlaylistCreatePlaylistExtension`]
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub struct PlaylistCreatePlaylistExtensionInner {
     pub created_for: Option<String>,

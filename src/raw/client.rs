@@ -2,7 +2,6 @@ use attohttpc::header::AUTHORIZATION;
 use serde::Serialize;
 
 use super::endpoint::Endpoint;
-use super::jspf;
 use super::request::*;
 use super::response::*;
 use crate::Error;
