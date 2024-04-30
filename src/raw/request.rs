@@ -4,7 +4,9 @@
 
 use std::borrow::Borrow;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+
+use super::jspf::AdditionalMetadata;
 
 // --------- submit-listens
 
@@ -82,6 +84,59 @@ pub struct PlaylistItemMove<'a> {
     pub from: u64,
     pub to: u64,
     pub count: u64,
+}
+
+// --------- playlist/create
+
+/// Request type for [`Client::playlist_create`](super::Client::playlist_create).
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub struct PlaylistCreate {
+    pub playlist: PlaylistCreatePlaylist
+}
+
+/// Inner type for [`PlaylistCreate`]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub struct PlaylistCreatePlaylist {
+    pub title: String,
+    pub tracks: Vec<PlaylistCreatePlaylistTrack>,
+    pub extension: PlaylistCreatePlaylistExtension
+}
+
+/// A track of the playlist for [`PlaylistCreatePlaylist`]
+/// 
+/// The identifier part of the track must be a MusicBrainz URI:
+/// ```
+/// PlaylistCreatePlaylistTrack {
+///     identifier: "8f3471b5-7e6a-48da-86a9-c1c07a0f47ae" // ❌ Invalid!
+/// }
+/// 
+/// PlaylistCreatePlaylistTrack {
+///     identifier: "https://musicbrainz.org/recording/8f3471b5-7e6a-48da-86a9-c1c07a0f47ae" // ✔️ Valid!
+/// }
+/// ```
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub struct PlaylistCreatePlaylistTrack {
+    pub identifier: String
+}
+
+/// The extension of [`PlaylistCreatePlaylist`]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub struct PlaylistCreatePlaylistExtension {
+    #[serde(rename = "https://musicbrainz.org/doc/jspf#track")]
+    pub musicbrainz: PlaylistCreatePlaylistExtensionInner,
+}
+
+/// Inner part of [`PlaylistCreatePlaylistExtension`]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub struct PlaylistCreatePlaylistExtensionInner {
+    pub created_for: Option<String>,
+    pub creator: Option<String>,
+    pub collaborators: Vec<String>,
+    pub copied_from: Option<String>,
+    pub copied_from_deleted: Option<bool>,
+    pub public: bool,
+    pub last_modified_at: Option<String>,
+    pub additional_metadata: Option<AdditionalMetadata>,
 }
 
 /// Type for use in generic contexts that want a string. Technically, only [Serialize] is required by the api,
