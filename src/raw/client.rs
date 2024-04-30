@@ -2,6 +2,7 @@ use attohttpc::header::AUTHORIZATION;
 use serde::Serialize;
 
 use super::endpoint::Endpoint;
+use super::jspf;
 use super::request::*;
 use super::response::*;
 use crate::Error;
@@ -131,6 +132,73 @@ impl Client {
         self.post(Endpoint::DeleteListen, token, data)
     }
 
+    /// Endpoint: [`user/{user_name}/playlists/collaborator`](https://listenbrainz.readthedocs.io/en/production/dev/api/#get--1-user-(playlist_user_name)-playlists-collaborator)
+    pub fn user_playlists_collaborator(
+        &self,
+        token: Option<&str>,
+        user_name: &str,
+        count: Option<u64>,
+        offset: Option<u64>,
+    ) -> Result<UserPlaylistsCollaboratorResponse, Error> {
+        let endpoint = format!(
+            "{}{}",
+            self.api_root_url,
+            Endpoint::UserPlaylistsCollaborator(user_name)
+        );
+
+        let mut request = attohttpc::get(endpoint);
+
+        if let Some(token) = token {
+            request = request.header("Authorization", format!("Token {}", token));
+        }
+        if let Some(count) = count {
+            request = request.param("count", count);
+        }
+        if let Some(offset) = offset {
+            request = request.param("offset", offset);
+        }
+
+        let response = request.send()?;
+
+        ResponseType::from_response(response)
+    }
+
+    /// Endpoint: [`user/{user_name}/playlists/createdfor`](https://listenbrainz.readthedocs.io/en/production/dev/api/#get--1-user-(playlist_user_name)-playlists-createdfor)
+    pub fn user_playlists_created_for(
+        &self,
+        token: Option<&str>,
+        user_name: &str,
+        count: Option<u64>,
+        offset: Option<u64>,
+    ) -> Result<UserPlaylistsCollaboratorResponse, Error> {
+        let endpoint = format!(
+            "{}{}",
+            self.api_root_url,
+            Endpoint::UserPlaylistsCreatedFor(user_name)
+        );
+
+        let mut request = attohttpc::get(endpoint);
+
+        if let Some(token) = token {
+            request = request.header("Authorization", format!("Token {}", token));
+        }
+        if let Some(count) = count {
+            request = request.param("count", count);
+        }
+        if let Some(offset) = offset {
+            request = request.param("offset", offset);
+        }
+
+        let response = request.send()?;
+
+        ResponseType::from_response(response)
+    }
+
+    /// Endpoint: [`user/{user_name}/similar-users`](https://listenbrainz.readthedocs.io/en/production/dev/api/#get--1-user-(user_name)-similar-users)
+    pub fn user_similar_users(&self, user_name: &str) -> Result<UserSimilarUsersResponse, Error> {
+        self.get(Endpoint::UserSimilarUsers(user_name))
+    }
+
     /// Endpoint: [`user/{user_name}/listen-count`](https://listenbrainz.readthedocs.io/en/production/dev/api/#get--1-user-(user_name)-listen-count)
     pub fn user_listen_count(&self, user_name: &str) -> Result<UserListenCountResponse, Error> {
         self.get(Endpoint::UserListenCount(user_name))
@@ -139,6 +207,46 @@ impl Client {
     /// Endpoint: [`user/{user_name}/playing-now`](https://listenbrainz.readthedocs.io/en/production/dev/api/#get--1-user-(user_name)-playing-now)
     pub fn user_playing_now(&self, user_name: &str) -> Result<UserPlayingNowResponse, Error> {
         self.get(Endpoint::UserPlayingNow(user_name))
+    }
+
+    /// Endpoint: [`user/{user_name}/similar-to/{other_user_name}`](https://listenbrainz.readthedocs.io/en/production/dev/api/#get--1-user-(user_name)-similar-to-(other_user_name))
+    pub fn user_similar_to(
+        &self,
+        user_name: &str,
+        other_user_name: &str,
+    ) -> Result<UserSimilarToResponse, Error> {
+        self.get(Endpoint::UserSimilarTo(user_name, other_user_name))
+    }
+
+    /// Endpoint: [`user/{user_name}/playlists`](https://listenbrainz.readthedocs.io/en/production/dev/api/#get--1-user-(playlist_user_name)-playlists)
+    pub fn user_playlists(
+        &self,
+        token: Option<&str>,
+        user_name: &str,
+        count: Option<u64>,
+        offset: Option<u64>,
+    ) -> Result<UserPlaylistsResponse, Error> {
+        let endpoint = format!(
+            "{}{}",
+            self.api_root_url,
+            Endpoint::UserPlaylists(user_name)
+        );
+
+        let mut request = attohttpc::get(endpoint);
+
+        if let Some(token) = token {
+            request = request.header("Authorization", format!("Token {}", token));
+        }
+        if let Some(count) = count {
+            request = request.param("count", count);
+        }
+        if let Some(offset) = offset {
+            request = request.param("offset", offset);
+        }
+
+        let response = request.send()?;
+
+        ResponseType::from_response(response)
     }
 
     /// Endpoint: [`user/{user_name}/listens`](https://listenbrainz.readthedocs.io/en/latest/users/api/core.html#get--1-user-(user_name)-listens)
@@ -179,6 +287,13 @@ impl Client {
         ResponseType::from_response(response)
     }
 
+    /// Endpoint:
+    /// [`playlist`](https://listenbrainz.readthedocs.io/en/latest/users/api/playlist.html#get--1-playlist-(playlist_mbid))
+    /// (`GET`)
+    pub fn get_playlist(&self, playlist: &str) -> Result<GetPlaylistResponse, Error> {
+        self.get(Endpoint::Playlist(playlist))
+    }
+
     /// Endpoint: [`latest-import`](https://listenbrainz.readthedocs.io/en/production/dev/api/#post--1-latest-import) (`POST`)
     pub fn update_latest_import(
         &self,
@@ -186,6 +301,33 @@ impl Client {
         data: UpdateLatestImport,
     ) -> Result<UpdateLatestImportResponse, Error> {
         self.post(Endpoint::LatestImport, token, data)
+    }
+
+    /// Endpoint: [`playlist/create`](https://listenbrainz.readthedocs.io/en/production/dev/api/#post--1-playlist-create)
+    pub fn playlist_create(
+        &self,
+        token: &str,
+        playlist: jspf::Playlist,
+    ) -> Result<PlaylistCreateResponse, Error> {
+        self.post(Endpoint::PlaylistCreate, token, playlist)
+    }
+
+    /// Endpoint: [`playlist/{playlist_mbid}/delete`](https://listenbrainz.readthedocs.io/en/production/dev/api/#post--1-playlist-(playlist_mbid)-delete)
+    pub fn playlist_delete(
+        &self,
+        token: &str,
+        playlist_mbid: &str,
+    ) -> Result<PlaylistDeleteResponse, Error> {
+        self.post(Endpoint::PlaylistDelete(playlist_mbid), token, ())
+    }
+
+    /// Endpoint: [`playlist/{playlist_mbid}/copy`](https://listenbrainz.readthedocs.io/en/production/dev/api/#post--1-playlist-(playlist_mbid)-copy)
+    pub fn playlist_copy(
+        &self,
+        token: &str,
+        playlist_mbid: &str,
+    ) -> Result<PlaylistCopyResponse, Error> {
+        self.post(Endpoint::PlaylistCopy(playlist_mbid), token, ())
     }
 
     /// Endpoint: [`stats/sitewide/artists`](https://listenbrainz.readthedocs.io/en/production/dev/api/#get--1-stats-sitewide-artists)
@@ -324,7 +466,6 @@ impl Client {
         self.get_stats(Endpoint::StatsUserArtists(user_name), count, offset, range)
     }
 
-    
     /// Endpoint: [`GET /1/stats/release-group/(release_group_mbid)/listeners`](https://listenbrainz.readthedocs.io/en/latest/users/api/statistics.html#get--1-stats-release-group-(release_group_mbid)-listeners)
     /// Get the top listeners for a release group, as well as getting the total number of listens for it
     pub fn stats_release_group_listeners(
@@ -354,6 +495,42 @@ impl Client {
         }
 
         let response = request.send()?;
+
+        ResponseType::from_response(response)
+    }
+
+    /// Endpoint: [`user/{user_name}/followers`](https://listenbrainz.readthedocs.io/en/production/dev/api/#get--1-user-(user_name)-followers)
+    pub fn user_followers(&self, user_name: &str) -> Result<UserFollowersResponse, Error> {
+        self.get(Endpoint::UserFollowers(user_name))
+    }
+
+    /// Endpoint: [`user/{user_name}/following`](https://listenbrainz.readthedocs.io/en/production/dev/api/#get--1-user-(user_name)-following)
+    pub fn user_following(&self, user_name: &str) -> Result<UserFollowingResponse, Error> {
+        self.get(Endpoint::UserFollowing(user_name))
+    }
+
+    /// Endpoint: [`user/{user_name}/unfollow`](https://listenbrainz.readthedocs.io/en/production/dev/api/#post--1-user-(user_name)-unfollow)
+    pub fn user_unfollow(
+        &self,
+        token: &str,
+        user_name: &str,
+    ) -> Result<UserUnfollowResponse, Error> {
+        let endpoint = format!("{}{}", self.api_root_url, Endpoint::UserUnfollow(user_name));
+
+        let response = attohttpc::post(endpoint)
+            .header("Authorization", format!("Token {}", token))
+            .send()?;
+
+        ResponseType::from_response(response)
+    }
+
+    /// Endpoint: [`user/{user_name}/follow`](https://listenbrainz.readthedocs.io/en/production/dev/api/#post--1-user-(user_name)-follow)
+    pub fn user_follow(&self, token: &str, user_name: &str) -> Result<UserFollowResponse, Error> {
+        let endpoint = format!("{}{}", self.api_root_url, Endpoint::UserFollow(user_name));
+
+        let response = attohttpc::post(endpoint)
+            .header("Authorization", format!("Token {}", token))
+            .send()?;
 
         ResponseType::from_response(response)
     }
