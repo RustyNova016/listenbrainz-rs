@@ -30,6 +30,14 @@ pub enum Endpoint<'a> {
     UserFollowing(&'a str),
     UserUnfollow(&'a str),
     UserFollow(&'a str),
+
+    // Popularity endpoints
+    PopularityTopRecordingsForArtist(&'a str),
+    PopularityTopReleaseGroupsForArtist(&'a str),
+    PopularityRecording,
+    PopularityArtist,
+    PopularityRelease,
+    PopularityReleaseGroup,
 }
 
 impl<'a> fmt::Display for Endpoint<'a> {
@@ -74,6 +82,14 @@ impl<'a> fmt::Display for Endpoint<'a> {
             Self::UserFollowing(user) => write!(f, "user/{}/following", user),
             Self::UserUnfollow(user) => write!(f, "user/{}/unfollow", user),
             Self::UserFollow(user) => write!(f, "user/{}/follow", user),
+
+            // Popularity endpoints
+            Self::PopularityTopRecordingsForArtist(artist) => return write!(f, "popularity/top-recordings-for-artist/{artist}"),
+            Self::PopularityTopReleaseGroupsForArtist(artist) => return write!(f, "popularity/top-release-groups-for-artist/{artist}"),
+            Self::PopularityRecording => write!(f, "popularity/recording") ,
+            Self::PopularityArtist => write!(f,  "popularity/artist"),
+            Self::PopularityRelease => write!(f, "popularity/release") ,
+            Self::PopularityReleaseGroup => write!(f, "popularity/release-group") ,
         }
     }
 }

@@ -4,9 +4,8 @@
 
 use std::borrow::Borrow;
 
-use serde::{Deserialize, Serialize};
-
 use super::jspf::AdditionalMetadata;
+use serde::{Deserialize, Serialize};
 
 // --------- submit-listens
 
@@ -103,13 +102,13 @@ pub struct PlaylistCreatePlaylist {
 }
 
 /// A track of the playlist for [`PlaylistCreatePlaylist`]
-/// 
+///
 /// The identifier part of the track must be a MusicBrainz URI:
 /// ```
 /// PlaylistCreatePlaylistTrack {
 ///     identifier: "8f3471b5-7e6a-48da-86a9-c1c07a0f47ae" // ❌ Invalid!
 /// }
-/// 
+///
 /// PlaylistCreatePlaylistTrack {
 ///     identifier: "https://musicbrainz.org/recording/8f3471b5-7e6a-48da-86a9-c1c07a0f47ae" // ✔️ Valid!
 /// }
@@ -164,5 +163,21 @@ pub enum Empty {}
 impl Borrow<str> for Empty {
     fn borrow(&self) -> &str {
         unreachable!("Should never be used as a value")
+    }
+}
+
+
+// ---------- Popularity Endpoints Requests
+
+// ---------- popularity/recording
+
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+pub struct PopularityRecordingRequest {
+    recording_mbids: Vec<String>
+}
+
+impl From<Vec<String>> for PopularityRecordingRequest {
+    fn from(value: Vec<String>) -> Self {
+        Self { recording_mbids: value }
     }
 }
