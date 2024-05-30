@@ -1,11 +1,11 @@
 [package]
-name = "listenbrainz"
-version = "0.7.0"
-authors = ["Koen Bolhuis <koen.bolhuis@gmail.com>"]
+name = "listenbrainz_rs_nova"
+version = "0.7.2"
+authors = ["Koen Bolhuis <koen.bolhuis@gmail.com>", "RustyNova"]
 edition = "2021"
 license = "MIT"
-repository = "https://github.com/InputUsername/listenbrainz-rs.git"
-homepage = "https://github.com/InputUsername/listenbrainz-rs"
+repository = "https://github.com/RustyNova016/listenbrainz-rs.git"
+homepage = "https://github.com/RustyNova016/listenbrainz-rs"
 readme = "README.md"
 description = "ListenBrainz API bindings for Rust"
 keywords = ["listenbrainz", "api", "bindings"]

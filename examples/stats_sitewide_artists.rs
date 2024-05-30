@@ -1,4 +1,4 @@
-use listenbrainz::raw::Client;
+use listenbrainz_rs_nova::raw::Client;
 
 fn main() {
     let client = Client::new();

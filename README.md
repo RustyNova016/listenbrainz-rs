@@ -1,13 +1,7 @@
-# listenbrainz
+# DO NOT USE THIS
+use [listenbrainz-rs](https://github.com/InputUsername/listenbrainz-rs) instead
 
-[![Crate](https://img.shields.io/crates/v/listenbrainz)](https://crates.io/crates/listenbrainz)
-[![Documentation](https://docs.rs/listenbrainz/badge.svg)](https://docs.rs/listenbrainz)
-[![CI builder](https://github.com/InputUsername/listenbrainz-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/InputUsername/listenbrainz-rs/actions/workflows/ci.yml)
-[![License](https://img.shields.io/crates/l/listenbrainz)](https://github.com/InputUsername/listenbrainz-rs/blob/main/LICENSE)
+This is just a temporary fork with some merged pull requests to allow the CI of [listenbrainz-cli-tools](https://github.com/RustyNova016/listenbrainz-cli-tools)
+to work. Concider it as a nighly version of https://github.com/InputUsername/listenbrainz-rs with selective feature merging.
 
-ListenBrainz API bindings for Rust.
-
-There is also [listenbrainz-rust](https://crates.io/crates/listenbrainz-rust). However, that crate
-only supports single listens, imports and now playing requests, and is also not maintained anymore.
-This crate, on the other hand, aims to be a complete API wrapper for the ListenBrainz API,
-version 1.
+I **will** break compatibility, and I **wont** care about your crates. listenbrainz-rs is still actively maintained, so use it instead.
