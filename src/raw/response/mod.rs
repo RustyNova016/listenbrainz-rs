@@ -46,6 +46,7 @@ pub use crate::raw::response::statistics::*;
 ///
 /// [API docs]: https://listenbrainz.readthedocs.io/en/production/dev/api/#rate-limiting
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 pub struct RateLimit {
     pub limit: u64,
     pub remaining: u64,

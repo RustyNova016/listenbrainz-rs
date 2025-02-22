@@ -16,6 +16,7 @@ use crate::raw::response::Deserialize;
 response_type! {
     /// Response type for [`Client::submit_listens`](super::Client::submit_listens).
     #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+    #[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
     pub struct SubmitListensResponse {
         pub status: String,
     }
@@ -27,6 +28,7 @@ response_type! {
 response_type! {
     /// Response type for [`Client::user_listens`](super::Client::user_listens).
     #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+    #[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
     pub struct UserListensResponse {
         pub payload: UserListensPayload,
     }
@@ -34,6 +36,7 @@ response_type! {
 
 /// Type of the [`UserListensResponse::payload`] field.
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 pub struct UserListensPayload {
     pub count: u64,
     pub latest_listen_ts: i64,
@@ -44,6 +47,7 @@ pub struct UserListensPayload {
 
 /// Type of the [`UserListensPayload::listens`] field.
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 pub struct UserListensListen {
     pub user_name: String,
     pub inserted_at: i64,
@@ -54,16 +58,19 @@ pub struct UserListensListen {
 
 /// Type of the [`UserListensListen::track_metadata`] field.
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 pub struct UserListensTrackMetadata {
     pub artist_name: String,
     pub track_name: String,
     pub release_name: Option<String>,
+    #[cfg_attr(feature = "arbitrary", arbitrary(default))] //TODO: Figure out how to make an arbitrary serde_json::value
     pub additional_info: HashMap<String, serde_json::Value>,
     pub mbid_mapping: Option<UserListensMBIDMapping>,
 }
 
 /// Type of the [`UserListensTrackMetadata::mbid_mapping`] field.
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 pub struct UserListensMBIDMapping {
     pub artist_mbids: Option<Vec<String>>,
     pub artists: Option<Vec<UserListensMappingArtist>>,
@@ -76,6 +83,7 @@ pub struct UserListensMBIDMapping {
 
 /// Type of the [`UserListensMBIDMapping::artists`] field.
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 pub struct UserListensMappingArtist {
     pub artist_mbid: String,
     pub artist_credit_name: String,
@@ -88,6 +96,7 @@ pub struct UserListensMappingArtist {
 response_type! {
     /// Response type for [`Client::user_listen_count`](super::Client::user_listen_count).
     #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+    #[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
     pub struct UserListenCountResponse {
         pub payload: UserListenCountPayload,
     }
@@ -95,6 +104,7 @@ response_type! {
 
 /// Type of the [`UserListenCountResponse::payload`] field.
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 pub struct UserListenCountPayload {
     pub count: u64,
 }
@@ -105,6 +115,7 @@ pub struct UserListenCountPayload {
 response_type! {
     /// Response type for [`Client::user_playing_now`](super::Client::user_playing_now).
     #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+    #[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
     pub struct UserPlayingNowResponse {
         pub payload: UserPlayingNowPayload,
     }
@@ -112,6 +123,7 @@ response_type! {
 
 /// Type of the [`UserPlayingNowResponse::payload`] field.
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 pub struct UserPlayingNowPayload {
     pub count: u8,
     pub user_id: String,
@@ -121,6 +133,7 @@ pub struct UserPlayingNowPayload {
 
 /// Type of the [`UserPlayingNowPayload::listens`] field.
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 pub struct UserPlayingNowListen {
     pub track_metadata: UserPlayingNowTrackMetadata,
     pub playing_now: bool,
@@ -128,10 +141,12 @@ pub struct UserPlayingNowListen {
 
 /// Type of the [`UserPlayingNowListen::track_metadata`] field.
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 pub struct UserPlayingNowTrackMetadata {
     pub artist_name: String,
     pub track_name: String,
     pub release_name: Option<String>,
+    #[cfg_attr(feature = "arbitrary", arbitrary(default))] //TODO: Figure out how to make an arbitrary serde_json::value
     pub additional_info: HashMap<String, serde_json::Value>,
 }
 
@@ -141,6 +156,7 @@ pub struct UserPlayingNowTrackMetadata {
 response_type! {
     /// Response type for [`Client::user_similar_users`](super::Client::user_similar_users).
     #[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
+    #[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
     pub struct UserSimilarUsersResponse {
         pub payload: Vec<UserSimilarUsersPayload>,
     }
@@ -148,6 +164,7 @@ response_type! {
 
 /// Type of the [`UserSimilarUsersResponse::payload`] field.
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
+#[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 pub struct UserSimilarUsersPayload {
     pub user_name: String,
     pub similarity: f64,
@@ -158,6 +175,7 @@ pub struct UserSimilarUsersPayload {
 
 response_type! {
     #[derive(Debug, Deserialize, Serialize)]
+    #[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
     pub struct UserSimilarToResponse {
         pub user_name: String,
         pub similarity: f64,
@@ -170,6 +188,7 @@ response_type! {
 response_type! {
     /// Response type for [`Client::validate_token`](super::Client::validate_token).
     #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+    #[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
     pub struct ValidateTokenResponse {
         pub code: u16,
         pub message: String,
@@ -185,6 +204,7 @@ response_type! {
 response_type! {
     /// Response type for [`Client::delete_listen`](super::Client::delete_listen).
     #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+    #[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
     pub struct DeleteListenResponse {
         pub status: String,
     }
@@ -216,6 +236,7 @@ response_type! {
 response_type! {
     /// Response type for [`Client::get_latest_import`](super::Client::get_latest_import).
     #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+    #[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
     pub struct GetLatestImportResponse {
         pub latest_import: i64,
         pub musicbrainz_id: String,
@@ -228,6 +249,7 @@ response_type! {
 response_type! {
     /// Response type for [`Client::update_latest_import`](super::Client::update_latest_import).
     #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+    #[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
     pub struct UpdateLatestImportResponse {
         pub status: String,
     }
